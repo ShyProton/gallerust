@@ -182,6 +182,9 @@
           glib.dev
           gtk4.dev
           cairo.dev
+          librsvg
+          libadwaita
+          adwaita-icon-theme
         ];
       };
     });
