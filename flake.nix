@@ -182,8 +182,8 @@
           glib.dev
           gtk4.dev
           cairo.dev
-          librsvg
-          libadwaita
+          librsvg.dev
+          libadwaita.dev
           adwaita-icon-theme
         ];
       };
