@@ -171,6 +171,7 @@
 
         # Additional dev-shell environment variables can be set directly
         # MY_CUSTOM_DEVELOPMENT_VAR = "something else";
+        RUST_LOG = "debug";
 
         # Extra inputs can be added here
         nativeBuildInputs = with pkgs; [

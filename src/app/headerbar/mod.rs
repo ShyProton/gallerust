@@ -1,13 +1,20 @@
+mod sorting_menu;
+
+use sorting_menu::SortingMenu;
+
 use relm4::gtk::prelude::*;
-use relm4::gtk::{Box, Button, HeaderBar, MenuButton};
+use relm4::gtk::{Align, Box, HeaderBar, MenuButton};
 use relm4::prelude::*;
-use relm4::{gtk, view};
 use relm4_icons::icon_names;
 
-pub struct HeaderModel;
+pub struct HeaderModel {
+    sorting_menu: Controller<SortingMenu>,
+}
 
 #[derive(Debug)]
-pub enum Input {}
+pub enum Input {
+    SortingOption(sorting_menu::Input),
+}
 
 #[relm4::component(pub)]
 impl SimpleComponent for HeaderModel {
@@ -21,22 +28,49 @@ impl SimpleComponent for HeaderModel {
 
             #[wrap(Some)]
             set_title_widget = &Box {
-                gtk::Image {
-                    set_icon_size: gtk::IconSize::Large,
-                    set_icon_name: Some(icon_names::PLUS)
+                set_hexpand: true,
+                set_halign: Align::End,
+                set_margin_all: 5,
+
+                Box {
+                    add_css_class: "linked",
+
+                    MenuButton {
+                        set_label: "View options",
+                        set_icon_name: icon_names::LIST_LARGE,
+                    },
+
+                    MenuButton {
+                        set_label: "Sorting options",
+                        set_icon_name: icon_names::DOWN_SMALL,
+
+                        set_popover = Some(model.sorting_menu.widget()),
+                    }
                 }
             }
         }
     }
 
     fn init(
-        init: Self::Init,
+        _init: Self::Init,
         root: Self::Root,
         sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
-        let model = Self {};
+        let sorting_menu: Controller<SortingMenu> = SortingMenu::builder()
+            .launch(sorting_menu::Init::Alphabetical) // TODO: Replace with saved setting.
+            .forward(sender.input_sender(), |msg| match msg {
+                sorting_menu::Output::OptionSelected(option) => Input::SortingOption(option),
+            });
+
+        let model = Self { sorting_menu };
         let widgets = view_output!();
 
         ComponentParts { model, widgets }
+    }
+
+    fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>) {
+        match message {
+            Input::SortingOption(option) => log::info!("{option:?}"), // TODO: Save setting.
+        }
     }
 }
