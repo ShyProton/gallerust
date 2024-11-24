@@ -335,6 +335,7 @@ name = "gallerust"
 version = "0.1.0"
 dependencies = [
  "env_logger",
+ "libadwaita",
  "log",
  "relm4",
  "relm4-components",

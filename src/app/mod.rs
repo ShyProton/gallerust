@@ -13,8 +13,7 @@ pub struct Model {
 
 #[derive(Debug)]
 pub enum Input {
-    Increment,
-    Decrement,
+    HeaderBar(headerbar::Input),
 }
 
 #[relm4::component(pub)]
@@ -39,26 +38,24 @@ impl SimpleComponent for Model {
                 set_margin_all: 5,
 
                 gtk::Button {
-                    set_label: "among us",
-                    connect_clicked => Input::Increment
+                    set_label: "Button",
                 },
 
-                gtk::Button::with_label("Decrement") {
-                    connect_clicked => Input::Decrement
+                gtk::Button {
+                    set_label: "Another button",
                 },
-
             }
         }
     }
 
     fn init(
-        counter: Self::Init,
+        init: Self::Init,
         root: Self::Root,
         sender: ComponentSender<Self>,
     ) -> ComponentParts<Self> {
         let header: Controller<HeaderModel> = HeaderModel::builder()
             .launch(())
-            .forward(sender.input_sender(), |msg| todo!());
+            .forward(sender.input_sender(), Input::HeaderBar);
 
         let model = Self { header };
         let widgets = view_output!();
@@ -66,10 +63,16 @@ impl SimpleComponent for Model {
         ComponentParts { model, widgets }
     }
 
-    // fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>) {
-    //     match message {
-    //         Input::Increment => self.counter = self.counter.wrapping_add(1),
-    //         Input::Decrement => self.counter = self.counter.wrapping_sub(1),
-    //     }
-    // }
+    fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>) {
+        let Input::HeaderBar(header_input) = message;
+
+        match header_input {
+            headerbar::Input::SortingOption(option) => {
+                log::info!("Sorting option selected: {option:?}");
+            }
+            headerbar::Input::ViewOption(option) => {
+                log::info!("View option selected: {option:?}");
+            }
+        }
+    }
 }

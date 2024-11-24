@@ -1,6 +1,8 @@
 mod sorting_menu;
+mod view_options;
 
 use sorting_menu::SortingMenu;
+use view_options::ViewOptions;
 
 use relm4::gtk::prelude::*;
 use relm4::gtk::{Align, Box, HeaderBar, MenuButton};
@@ -9,20 +11,25 @@ use relm4_icons::icon_names;
 
 pub struct HeaderModel {
     sorting_menu: Controller<SortingMenu>,
+    view_options: Controller<ViewOptions>,
 }
 
 #[derive(Debug)]
 pub enum Input {
     SortingOption(sorting_menu::Input),
+    ViewOption(view_options::Input),
 }
+
+pub type Output = Input;
 
 #[relm4::component(pub)]
 impl SimpleComponent for HeaderModel {
     type Input = Input;
-    type Output = ();
+    type Output = Output;
     type Init = ();
 
     view! {
+        // TODO: Incorporate progress bar to show loading status of images.
         HeaderBar {
             set_show_title_buttons: true,
 
@@ -37,7 +44,9 @@ impl SimpleComponent for HeaderModel {
 
                     MenuButton {
                         set_label: "View options",
-                        set_icon_name: icon_names::LIST_LARGE,
+                        set_icon_name: icon_names::GRID_FILLED,
+
+                        set_popover = Some(model.view_options.widget()),
                     },
 
                     MenuButton {
@@ -62,15 +71,25 @@ impl SimpleComponent for HeaderModel {
                 sorting_menu::Output::OptionSelected(option) => Input::SortingOption(option),
             });
 
-        let model = Self { sorting_menu };
+        let view_options: Controller<ViewOptions> = ViewOptions::builder()
+            .launch(())
+            .forward(sender.input_sender(), |msg| match msg {});
+
+        let model = Self {
+            sorting_menu,
+            view_options,
+        };
+
         let widgets = view_output!();
 
         ComponentParts { model, widgets }
     }
 
     fn update(&mut self, message: Self::Input, sender: ComponentSender<Self>) {
-        match message {
-            Input::SortingOption(option) => log::info!("{option:?}"), // TODO: Save setting.
-        }
+        let message_str = format!("{message:?}");
+
+        sender.output(message).unwrap_or_else(|_| {
+            log::error!("Could not send HeaderBar input to parent: {message_str}");
+        });
     }
 }
