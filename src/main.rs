@@ -1,4 +1,4 @@
-use app::Model;
+use app::AppModel;
 use relm4::RelmApp;
 
 mod app;
@@ -10,5 +10,5 @@ fn main() {
     adw::init().expect("Failed to initialize libadwaita.");
 
     let app = RelmApp::new("com.github.ShyProton.Gallerust");
-    app.run::<Model>(0);
+    app.run::<AppModel>(0);
 }

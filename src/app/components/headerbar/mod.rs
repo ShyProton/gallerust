@@ -5,11 +5,10 @@ use sorting_menu::SortingMenu;
 use view_options::ViewOptions;
 
 use relm4::gtk::prelude::*;
-use relm4::gtk::{Align, Box, HeaderBar, MenuButton};
 use relm4::prelude::*;
 use relm4_icons::icon_names;
 
-pub struct HeaderModel {
+pub struct HeaderBarModel {
     sorting_menu: Controller<SortingMenu>,
     view_options: Controller<ViewOptions>,
 }
@@ -23,38 +22,28 @@ pub enum Input {
 pub type Output = Input;
 
 #[relm4::component(pub)]
-impl SimpleComponent for HeaderModel {
+impl SimpleComponent for HeaderBarModel {
     type Input = Input;
     type Output = Output;
     type Init = ();
 
     view! {
         // TODO: Incorporate progress bar to show loading status of images.
-        HeaderBar {
-            set_show_title_buttons: true,
-
+        adw::HeaderBar {
             #[wrap(Some)]
-            set_title_widget = &Box {
+            set_title_widget = &gtk::Box {
                 set_hexpand: true,
-                set_halign: Align::End,
+                set_halign: gtk::Align::End,
                 set_margin_all: 5,
 
-                Box {
-                    add_css_class: "linked",
+                adw::SplitButton {
+                    add_css_class: "raised",
 
-                    MenuButton {
-                        set_label: "View options",
-                        set_icon_name: icon_names::GRID_FILLED,
+                    set_label: "View",
+                    set_icon_name: icon_names::GRID_FILLED,
 
-                        set_popover = Some(model.view_options.widget()),
-                    },
-
-                    MenuButton {
-                        set_label: "Sorting options",
-                        set_icon_name: icon_names::DOWN_SMALL,
-
-                        set_popover = Some(model.sorting_menu.widget()),
-                    }
+                    set_popover = Some(model.sorting_menu.widget()),
+                    set_dropdown_tooltip: "Sorting Options",
                 }
             }
         }
